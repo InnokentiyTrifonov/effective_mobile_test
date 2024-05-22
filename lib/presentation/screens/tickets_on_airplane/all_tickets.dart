@@ -155,7 +155,7 @@ class _FragmentWithTickets extends StatelessWidget {
                 return Stack(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: PaddingResource.FOURTEEN),
+                      padding: const EdgeInsets.symmetric(vertical: PaddingResource.EIGHT),
                       child: Container(
                         width: double.maxFinite,
                         height: 100,
