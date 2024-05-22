@@ -10,4 +10,12 @@ class NavigationService {
   void goBack() {
     navigationKey.currentState?.pop();
   }
+
+  bool canPop() {
+    if (navigationKey.currentState != null) {
+      return navigationKey.currentState!.canPop();
+    } else {
+      return false;
+    }
+  }
 }

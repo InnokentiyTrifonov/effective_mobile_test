@@ -16,6 +16,7 @@ import 'package:effective_mobile_test/theme/drawable_resources.dart';
 import 'package:effective_mobile_test/theme/string_resources.dart';
 import 'package:effective_mobile_test/theme/style_resources.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HomePage extends StatefulWidget {
@@ -108,63 +109,81 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class TicketsOnAirPlaneNavigator extends StatelessWidget {
+class TicketsOnAirPlaneNavigator extends StatefulWidget {
   const TicketsOnAirPlaneNavigator({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Navigator(
-      key: locator<NavigationService>().navigationKey,
-      initialRoute: "/",
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case "/":
-            return PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => const TicketsOnAirPlane(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
-            );
-          case "/TICKETS_CONFIGURATION":
-            return PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const TicketConfiguration(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero);
-          case "/DIFFICULT_ROUTE":
-            return PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const DifficultRoute(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero);
-          case "/ANYWHERE":
-            return PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const Anywhere(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero);
-          case "/WEEKENDS":
-            return PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const Weekends(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero);
-          case "/HOT_TICKETS":
-            return PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const HotTickets(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero);
-          case "/ALL_TICKETS":
-            return PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => const AllTickets(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero);
+  State<TicketsOnAirPlaneNavigator> createState() => _TicketsOnAirPlaneNavigatorState();
+}
 
-          default:
-            return PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => const Scaffold(
-                body: Center(
-                  child: Text("Page not found"),
-                ),
-              ),
-            );
+class _TicketsOnAirPlaneNavigatorState extends State<TicketsOnAirPlaneNavigator> {
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          return;
+        }
+        if (locator<NavigationService>().canPop()) {
+          locator<NavigationService>().goBack();
+        } else {
+          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
         }
       },
+      child: Navigator(
+        key: locator<NavigationService>().navigationKey,
+        initialRoute: "/",
+        onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case "/":
+              return PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const TicketsOnAirPlane(),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              );
+            case "/TICKETS_CONFIGURATION":
+              return PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const TicketConfiguration(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero);
+            case "/DIFFICULT_ROUTE":
+              return PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const DifficultRoute(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero);
+            case "/ANYWHERE":
+              return PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const Anywhere(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero);
+            case "/WEEKENDS":
+              return PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const Weekends(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero);
+            case "/HOT_TICKETS":
+              return PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const HotTickets(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero);
+            case "/ALL_TICKETS":
+              return PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const AllTickets(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero);
+
+            default:
+              return PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => const Scaffold(
+                  body: Center(
+                    child: Text("Page not found"),
+                  ),
+                ),
+              );
+          }
+        },
+      ),
     );
   }
 }

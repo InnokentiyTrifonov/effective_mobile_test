@@ -147,9 +147,7 @@ class _FragmentWithTickets extends StatelessWidget {
     return BlocConsumer<ReceiveAllTicketsBloc, ReceiveAllTicketsState>(
       builder: (context, state) {
         if (state is TicketsReceivedSuccesful) {
-          return SizedBox(
-            height: MediaQuery.of(context).size.height * 0.68,
-            width: double.maxFinite,
+          return Expanded(
             child: ListView.builder(
               itemCount: state.tickets.length,
               itemBuilder: (context, index) {
