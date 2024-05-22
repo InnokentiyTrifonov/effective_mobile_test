@@ -62,6 +62,58 @@ class _FragmentWithInputFieldsState extends State<_FragmentWithInputFields> {
   final TextEditingController _currentCityController = TextEditingController();
   final TextEditingController _desiredCityController = TextEditingController();
 
+  void _onChangeCurrentCity() {
+    if (_currentCityController.text.trim().isNotEmpty) {
+      context
+          .read<LocalHistoryBloc>()
+          .add(SaveCity(key: LocalHistoryKeys.currentCity, city: _currentCityController.text.trim()));
+      context.read<LocalHistoryBloc>().add(const GetSavedCities(
+            currentCityKey: LocalHistoryKeys.currentCity,
+            desiredCityKey: LocalHistoryKeys.desiredCity,
+          ));
+    } else {
+      context.read<LocalHistoryBloc>().add(const RemoveCity(key: LocalHistoryKeys.currentCity));
+      context.read<LocalHistoryBloc>().add(
+            const GetSavedCities(
+              currentCityKey: LocalHistoryKeys.currentCity,
+              desiredCityKey: LocalHistoryKeys.desiredCity,
+            ),
+          );
+    }
+  }
+
+  void _onChangeDesiredCity() {
+    if (_desiredCityController.text.trim().isNotEmpty) {
+      context
+          .read<LocalHistoryBloc>()
+          .add(SaveCity(key: LocalHistoryKeys.desiredCity, city: _desiredCityController.text.trim()));
+      context.read<LocalHistoryBloc>().add(const GetSavedCities(
+            currentCityKey: LocalHistoryKeys.currentCity,
+            desiredCityKey: LocalHistoryKeys.desiredCity,
+          ));
+    } else {
+      context.read<LocalHistoryBloc>().add(const RemoveCity(key: LocalHistoryKeys.desiredCity));
+      context.read<LocalHistoryBloc>().add(const GetSavedCities(
+            currentCityKey: LocalHistoryKeys.currentCity,
+            desiredCityKey: LocalHistoryKeys.desiredCity,
+          ));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _currentCityController.addListener(_onChangeCurrentCity);
+    _desiredCityController.addListener(_onChangeDesiredCity);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _currentCityController.dispose();
+    _desiredCityController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LocalHistoryBloc, LocalHistoryState>(
@@ -100,26 +152,6 @@ class _FragmentWithInputFieldsState extends State<_FragmentWithInputFields> {
                     hintText: StringResource.HINT_FROM_WHICH_CITY,
                     controller: _currentCityController,
                     textInputAction: TextInputAction.next,
-                    onSubmitted: (value) {
-                      if (value != null && value.isNotEmpty) {
-                        context.read<LocalHistoryBloc>().add(SaveCity(key: LocalHistoryKeys.currentCity, city: value));
-                        context.read<LocalHistoryBloc>().add(const GetSavedCities(
-                              currentCityKey: LocalHistoryKeys.currentCity,
-                              desiredCityKey: LocalHistoryKeys.desiredCity,
-                            ));
-                        if (_currentCityController.text.isNotEmpty && _desiredCityController.text.isNotEmpty) {
-                          Navigator.pop(context);
-                          locator<NavigationService>().pushTo("/TICKETS_CONFIGURATION");
-                          return;
-                        }
-                        return;
-                      }
-                      context.read<LocalHistoryBloc>().add(const RemoveCity(key: LocalHistoryKeys.currentCity));
-                      context.read<LocalHistoryBloc>().add(const GetSavedCities(
-                            currentCityKey: LocalHistoryKeys.currentCity,
-                            desiredCityKey: LocalHistoryKeys.desiredCity,
-                          ));
-                    },
                   ),
                   const Divider(
                     color: ColorResource.GRAY_FIVE,
@@ -128,10 +160,12 @@ class _FragmentWithInputFieldsState extends State<_FragmentWithInputFields> {
                     suffixIconPressed: () {
                       _desiredCityController.clear();
                       context.read<LocalHistoryBloc>().add(const RemoveCity(key: LocalHistoryKeys.desiredCity));
-                      context.read<LocalHistoryBloc>().add(const GetSavedCities(
-                            currentCityKey: LocalHistoryKeys.currentCity,
-                            desiredCityKey: LocalHistoryKeys.desiredCity,
-                          ));
+                      context.read<LocalHistoryBloc>().add(
+                            const GetSavedCities(
+                              currentCityKey: LocalHistoryKeys.currentCity,
+                              desiredCityKey: LocalHistoryKeys.desiredCity,
+                            ),
+                          );
                     },
                     suffixIcon: SvgPicture.asset(
                       IconResource.CLOSE,
@@ -146,26 +180,13 @@ class _FragmentWithInputFieldsState extends State<_FragmentWithInputFields> {
                     hintText: StringResource.HINT_TO_WHICH_CITY,
                     textInputAction: TextInputAction.done,
                     onSubmitted: (value) {
-                      if (value != null && value.isNotEmpty) {
-                        context.read<LocalHistoryBloc>().add(SaveCity(key: LocalHistoryKeys.desiredCity, city: value));
-                        context.read<LocalHistoryBloc>().add(const GetSavedCities(
-                              currentCityKey: LocalHistoryKeys.currentCity,
-                              desiredCityKey: LocalHistoryKeys.desiredCity,
-                            ));
-                        if (_currentCityController.text.isNotEmpty && _desiredCityController.text.isNotEmpty) {
-                          context.read<DirectFlightsBloc>().add(ReciveDirectFlights());
-                          Navigator.pop(context);
-                          locator<NavigationService>().pushTo("/TICKETS_CONFIGURATION");
-                          return;
-                        }
-
+                      if (_currentCityController.text.trim().isNotEmpty &&
+                          _desiredCityController.text.trim().isNotEmpty) {
+                        context.read<DirectFlightsBloc>().add(ReciveDirectFlights());
+                        Navigator.pop(context);
+                        locator<NavigationService>().pushTo("/TICKETS_CONFIGURATION");
                         return;
                       }
-                      context.read<LocalHistoryBloc>().add(const RemoveCity(key: LocalHistoryKeys.desiredCity));
-                      context.read<LocalHistoryBloc>().add(const GetSavedCities(
-                            currentCityKey: LocalHistoryKeys.currentCity,
-                            desiredCityKey: LocalHistoryKeys.desiredCity,
-                          ));
                     },
                   ),
                 ],
@@ -293,98 +314,104 @@ class _Recommendations extends StatelessWidget {
           currentCity = localHistoryState.currentCity;
         }
 
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.25,
-          width: double.maxFinite,
-          decoration: BoxDecoration(
-            color: ColorResource.GRAY_THREE,
-            borderRadius: BorderRadius.circular(RadiusResource.SIXTEEN),
-          ),
-          child: BlocBuilder<RecommendationBloc, RecommendationState>(
-            builder: (context, recommendationsState) {
-              if (recommendationsState is RecommendationSuccessfulReceived) {
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: PaddingResource.SIXTEEN),
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: PaddingResource.EIGHT),
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          if (currentCity != null) {
-                            context.read<LocalHistoryBloc>().add(SaveCity(
-                                  key: LocalHistoryKeys.desiredCity,
-                                  city: recommendationsState.recommendations[index].city,
-                                ));
-                            context.read<LocalHistoryBloc>().add(const GetSavedCities(
-                                  currentCityKey: LocalHistoryKeys.currentCity,
-                                  desiredCityKey: LocalHistoryKeys.desiredCity,
-                                ));
-                            context.read<DirectFlightsBloc>().add(ReciveDirectFlights());
-                            Navigator.pop(context);
-                            locator<NavigationService>().pushTo("/TICKETS_CONFIGURATION");
-                            return;
-                          }
-                          context.read<LocalHistoryBloc>().add(SaveCity(
-                                key: LocalHistoryKeys.desiredCity,
-                                city: recommendationsState.recommendations[index].city,
-                              ));
-                          context.read<LocalHistoryBloc>().add(const GetSavedCities(
-                                currentCityKey: LocalHistoryKeys.currentCity,
-                                desiredCityKey: LocalHistoryKeys.desiredCity,
-                              ));
+        return UnconstrainedBox(
+          constrainedAxis: Axis.horizontal,
+          child: Container(
+            padding: const EdgeInsets.all(smallSpace),
+            decoration: BoxDecoration(
+              color: ColorResource.GRAY_THREE,
+              borderRadius: BorderRadius.circular(RadiusResource.SIXTEEN),
+            ),
+            child: BlocBuilder<RecommendationBloc, RecommendationState>(
+              builder: (context, recommendationsState) {
+                if (recommendationsState is RecommendationSuccessfulReceived) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...recommendationsState.recommendations.map(
+                        (item) {
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              if (currentCity != null) {
+                                context.read<LocalHistoryBloc>().add(SaveCity(
+                                      key: LocalHistoryKeys.desiredCity,
+                                      city: item.city,
+                                    ));
+                                context.read<LocalHistoryBloc>().add(const GetSavedCities(
+                                      currentCityKey: LocalHistoryKeys.currentCity,
+                                      desiredCityKey: LocalHistoryKeys.desiredCity,
+                                    ));
+                                context.read<DirectFlightsBloc>().add(ReciveDirectFlights());
+                                Navigator.pop(context);
+                                locator<NavigationService>().pushTo("/TICKETS_CONFIGURATION");
+                                return;
+                              }
+                              context.read<LocalHistoryBloc>().add(SaveCity(
+                                    key: LocalHistoryKeys.desiredCity,
+                                    city: item.city,
+                                  ));
+                              context.read<LocalHistoryBloc>().add(const GetSavedCities(
+                                    currentCityKey: LocalHistoryKeys.currentCity,
+                                    desiredCityKey: LocalHistoryKeys.desiredCity,
+                                  ));
 
-                          return;
-                        },
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(RadiusResource.EIGHT),
-                              child: Image.asset(
-                                recommendationsState.recommendations[index].image,
-                                fit: BoxFit.fill,
-                                width: 45,
-                                height: 45,
-                              ),
-                            ),
-                            const SizedBox(width: PaddingResource.FOURTEEN),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
+                              return;
+                            },
+                            child: Column(
                               children: [
-                                Text(
-                                  recommendationsState.recommendations[index].city,
-                                  style: const TextStyle(
-                                    fontFamily: FontFamilyResource.MEDIUM,
-                                    color: ColorResource.WHITE,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: FontSizeResource.SIXTEEN,
-                                  ),
+                                Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(RadiusResource.EIGHT),
+                                      child: Image.asset(
+                                        item.image,
+                                        fit: BoxFit.fill,
+                                        width: 45,
+                                        height: 45,
+                                      ),
+                                    ),
+                                    const SizedBox(width: PaddingResource.FOURTEEN),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          item.city,
+                                          style: const TextStyle(
+                                            fontFamily: FontFamilyResource.MEDIUM,
+                                            color: ColorResource.WHITE,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: FontSizeResource.SIXTEEN,
+                                          ),
+                                        ),
+                                        const Text(
+                                          StringResource.POPULAR_DESTINATION,
+                                          style: TextStyle(
+                                            fontFamily: FontFamilyResource.SEMIBOLD,
+                                            color: ColorResource.GRAY_FIVE,
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: FontSizeResource.FOURTEEN,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                const Text(
-                                  StringResource.POPULAR_DESTINATION,
-                                  style: TextStyle(
-                                    fontFamily: FontFamilyResource.SEMIBOLD,
-                                    color: ColorResource.GRAY_FIVE,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: FontSizeResource.FOURTEEN,
-                                  ),
-                                ),
+                                const Divider(),
                               ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                  separatorBuilder: (context, index) => const Divider(),
-                  itemCount: recommendationsState.recommendations.length,
+                    ],
+                  );
+                }
+                return const Center(
+                  child: Text(StringResource.NO_RECOMMENDATIONS),
                 );
-              }
-              return const Center(
-                child: Text(StringResource.NO_RECOMMENDATIONS),
-              );
-            },
+              },
+            ),
           ),
         );
       },

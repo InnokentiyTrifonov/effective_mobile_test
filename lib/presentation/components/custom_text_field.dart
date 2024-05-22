@@ -10,17 +10,17 @@ class CustomTextField extends StatelessWidget {
     this.hintText,
     required this.controller,
     this.textInputAction,
-    this.onSubmitted,
     this.suffixIcon,
     this.suffixIconPressed,
+    this.onSubmitted,
   });
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final String? hintText;
   final TextInputAction? textInputAction;
   final TextEditingController controller;
-  final void Function(String?)? onSubmitted;
   final void Function()? suffixIconPressed;
+  final void Function(String)? onSubmitted;
 
   Widget? _prefixIconCustomized() {
     if (prefixIcon != null) {
