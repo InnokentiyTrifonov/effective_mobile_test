@@ -7,6 +7,7 @@ import 'package:effective_mobile_test/domain/blocs/recive_all_tickets/recive_all
 import 'package:effective_mobile_test/domain/models/dates.dart';
 import 'package:effective_mobile_test/domain/navigator/navigation_service.dart';
 import 'package:effective_mobile_test/presentation/components/custom_button.dart';
+import 'package:effective_mobile_test/presentation/components/custom_switcher.dart';
 import 'package:effective_mobile_test/theme/color_resources.dart';
 import 'package:effective_mobile_test/theme/drawable_resources.dart';
 import 'package:effective_mobile_test/theme/string_resources.dart';
@@ -659,14 +660,14 @@ class _SubsctibeOnPriceState extends State<_SubsctibeOnPrice> {
             ),
           ),
           const Spacer(),
-          Switch(
-            value: isSwitched,
+          CustomSwitcher(
+            isSwitched: isSwitched,
             onChanged: (value) {
               setState(() {
                 isSwitched = value;
               });
             },
-          )
+          ),
         ],
       ),
     );
