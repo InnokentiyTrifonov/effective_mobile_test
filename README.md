@@ -2,4 +2,7 @@
 
 Test task for the position of flutter developer
 
-
+# ENV
+API_BASE_URL=https://run.mocky.io/v3
+current_city=FROM_WHICH_CITY
+desired_city=TO_WHICH_CITY
