@@ -1,7 +1,7 @@
 import 'package:effective_mobile_test/core/theme/drawable_resources.dart';
 import 'package:effective_mobile_test/core/theme/string_resources.dart';
-import 'package:effective_mobile_test/interfaces/recommendation_i.dart';
-import 'package:effective_mobile_test/models/recommendation.dart';
+import 'package:effective_mobile_test/domain/interfaces/recommendation_i.dart';
+import 'package:effective_mobile_test/domain/models/recommendation.dart';
 
 final class RecommendationService implements RecommendationServiceI {
   @override

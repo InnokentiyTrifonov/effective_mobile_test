@@ -38,6 +38,9 @@ migrate_working_dir/
 .env
 .env.*
 
+# Code generation
+*.g.dart
+
 # Symbolication related
 app.*.symbols
 

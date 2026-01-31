@@ -1,10 +1,10 @@
-import 'package:effective_mobile_test/clients/api_client.dart';
-import 'package:effective_mobile_test/clients/response_models/offers/offers.dart';
+import 'package:effective_mobile_test/core/clients/api_client.dart';
+import 'package:effective_mobile_test/core/clients/response_models/offers/offers.dart';
 import 'package:effective_mobile_test/core/extensions/offer_extensions.dart';
-import 'package:effective_mobile_test/interfaces/api_service_i.dart';
-import 'package:effective_mobile_test/models/direct_flight.dart';
-import 'package:effective_mobile_test/models/musical_direction.dart';
-import 'package:effective_mobile_test/models/ticket.dart';
+import 'package:effective_mobile_test/domain/interfaces/api_service_i.dart';
+import 'package:effective_mobile_test/domain/models/direct_flight.dart';
+import 'package:effective_mobile_test/domain/models/musical_direction.dart';
+import 'package:effective_mobile_test/domain/models/ticket.dart';
 
 class ApiService implements ApiServiceI {
   final ApiClient client;

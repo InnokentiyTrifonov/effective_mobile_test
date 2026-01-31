@@ -1,5 +1,5 @@
-import 'package:effective_mobile_test/clients/response_models/offers/offer.dart';
-import 'package:effective_mobile_test/clients/response_models/ticket_offers/ticket_offer.dart';
+import 'package:effective_mobile_test/core/clients/response_models/offers/offer.dart';
+import 'package:effective_mobile_test/core/clients/response_models/ticket_offers/ticket_offer.dart';
 import 'package:effective_mobile_test/core/theme/color_resources.dart';
 import 'package:effective_mobile_test/core/theme/drawable_resources.dart';
 import 'package:flutter/material.dart';

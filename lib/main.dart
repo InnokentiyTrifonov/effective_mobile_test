@@ -1,25 +1,25 @@
 import 'package:dio/dio.dart';
-import 'package:effective_mobile_test/blocs/direct_flights/direct_flights_bloc.dart';
-import 'package:effective_mobile_test/blocs/local_history/local_history_bloc.dart';
-import 'package:effective_mobile_test/blocs/musical_directions/musical_directions_bloc.dart';
-import 'package:effective_mobile_test/blocs/receive_all_tickets/recive_all_tickets_bloc.dart';
-import 'package:effective_mobile_test/blocs/recommendation/recommendation_bloc.dart';
-import 'package:effective_mobile_test/clients/api_client.dart';
+import 'package:effective_mobile_test/core/clients/api_client.dart';
 import 'package:effective_mobile_test/core/theme/color_resources.dart';
 import 'package:effective_mobile_test/data/api_service.dart';
+import 'package:effective_mobile_test/data/db.dart';
 import 'package:effective_mobile_test/data/recommendation_service.dart';
-import 'package:effective_mobile_test/db/db.dart';
-import 'package:effective_mobile_test/interactors/get_all_tickets_interactor.dart';
-import 'package:effective_mobile_test/interactors/get_current_city_interactor.dart';
-import 'package:effective_mobile_test/interactors/get_desired_city_interactor.dart';
-import 'package:effective_mobile_test/interactors/get_music_tickets_interactor.dart';
-import 'package:effective_mobile_test/interactors/get_recommendations_interactor.dart';
-import 'package:effective_mobile_test/interactors/get_ticket_offers_interactor.dart';
-import 'package:effective_mobile_test/interactors/remove_current_city_interactor.dart';
-import 'package:effective_mobile_test/interactors/remove_desired_city_interactor.dart';
-import 'package:effective_mobile_test/interactors/save_current_city_interactor.dart';
-import 'package:effective_mobile_test/interactors/save_desired_city_interactor.dart';
-import 'package:effective_mobile_test/ui/screens/home.dart';
+import 'package:effective_mobile_test/domain/interactors/get_all_tickets_interactor.dart';
+import 'package:effective_mobile_test/domain/interactors/get_cities_interactor.dart';
+import 'package:effective_mobile_test/domain/interactors/get_music_tickets_interactor.dart';
+import 'package:effective_mobile_test/domain/interactors/get_recommendations_interactor.dart';
+import 'package:effective_mobile_test/domain/interactors/get_ticket_offers_interactor.dart';
+import 'package:effective_mobile_test/domain/interactors/remove_current_city_interactor.dart';
+import 'package:effective_mobile_test/domain/interactors/remove_desired_city_interactor.dart';
+import 'package:effective_mobile_test/domain/interactors/save_current_city_interactor.dart';
+import 'package:effective_mobile_test/domain/interactors/save_desired_city_interactor.dart';
+import 'package:effective_mobile_test/domain/interactors/switch_cities_interactor.dart';
+import 'package:effective_mobile_test/presentation/blocs/direct_flights/direct_flights_bloc.dart';
+import 'package:effective_mobile_test/presentation/blocs/local_history/local_history_bloc.dart';
+import 'package:effective_mobile_test/presentation/blocs/musical_directions/musical_directions_bloc.dart';
+import 'package:effective_mobile_test/presentation/blocs/receive_all_tickets/recive_all_tickets_bloc.dart';
+import 'package:effective_mobile_test/presentation/blocs/recommendation/recommendation_bloc.dart';
+import 'package:effective_mobile_test/presentation/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -39,12 +39,8 @@ void main() async {
         RepositoryProvider<GetAllTicketsInteractor>(
           create: (context) => GetAllTicketsInteractor(apiService),
         ),
-        RepositoryProvider<GetCurrentCityInteractor>(
-          create: (context) => GetCurrentCityInteractor(db),
-        ),
-        RepositoryProvider<GetDesiredCityInteractor>(
-          create: (context) => GetDesiredCityInteractor(db),
-        ),
+        RepositoryProvider<GetCitiesInteractor>(create: (context) => GetCitiesInteractor(db)),
+        RepositoryProvider<SwitchCitiesInteractor>(create: (context) => SwitchCitiesInteractor(db)),
         RepositoryProvider<GetMusicTicketsInteractor>(
           create: (context) => GetMusicTicketsInteractor(apiService),
         ),
@@ -76,8 +72,8 @@ void main() async {
           ),
           BlocProvider<LocalHistoryBloc>(
             create: (BuildContext context) => LocalHistoryBloc(
-              context.read<GetCurrentCityInteractor>(),
-              context.read<GetDesiredCityInteractor>(),
+              context.read<GetCitiesInteractor>(),
+              context.read<SwitchCitiesInteractor>(),
               context.read<SaveCurrentCityInteractor>(),
               context.read<SaveDesiredCityInteractor>(),
               context.read<RemoveCurrentCityInteractor>(),
